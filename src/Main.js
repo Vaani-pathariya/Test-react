@@ -14,7 +14,7 @@ function YourMessagingComponent() {
   useEffect(() => {
     // Listen for incoming messages
     socket.on('message', (message) => {
-      setMessages([...messages, message]);
+      console.log(message)
     });
 
     // Clean up the socket connection when the component unmounts
@@ -27,6 +27,20 @@ function YourMessagingComponent() {
         password
       });
       localStorage.setItem("token", response.data.token);
+      socket.emit('authenticate', localStorage.getItem("token"));
+      console.log(response.data)
+    } catch (error) {
+      console.error('Signup error:', error.response ? error.response.data : error.message);
+    }
+  };
+  const handleSignup = async () => {
+    try {
+      const response = await axios.post(`http://localhost:8000/signup`, {
+        email,
+        password
+      });
+      localStorage.setItem("token", response.data.token);
+      socket.emit('authenticate', localStorage.getItem("token"));
       console.log(response.data)
     } catch (error) {
       console.error('Signup error:', error.response ? error.response.data : error.message);
@@ -43,7 +57,20 @@ function YourMessagingComponent() {
     // Update the local state or clear the input field
     setNewMessage('');
   };
-
+  const msg=async()=>{
+    try {
+      const response = await axios.post(`http://localhost:8000/unread-messages`,{
+        user2IdString:id
+      },{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      console.log(response.data)
+    } catch (error) {
+      console.error('Signup error:', error.response ? error.response.data : error.message);
+    }
+  }
   return (
     <div>
       {/* Display your messages */}
@@ -82,6 +109,7 @@ function YourMessagingComponent() {
         value={password}
         onChange={(e) => setPass(e.target.value)}
       />
+      <button onClick={msg}>Get msg</button>
     </div>
   );
 }
