@@ -9,8 +9,12 @@ function YourMessagingComponent() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [id,setId]=useState('');
-  const [email,setEmail]=useState('')
-  const [password,setPass]=useState('')
+  const [email,setEmail]=useState('vp@gmail.com')
+  const [password,setPass]=useState('ABCDEF')
+  const [name,setName]=useState('Vaani')
+  const [zealId,setZealId]=useState('2')
+  const [scannedCode,setCode]=useState('65993fd348ca164f23952fc6')
+  const [teamIdStr,setTeamId]=useState('65999d9ccd59de25d66ab7a8')
   useEffect(() => {
     // Listen for incoming messages
     socket.on('message', (message) => {
@@ -23,7 +27,7 @@ function YourMessagingComponent() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(`http://localhost:8000/login`, {
-        email,
+        zealId,
         password
       });
       localStorage.setItem("token", response.data.token);
@@ -37,7 +41,9 @@ function YourMessagingComponent() {
     try {
       const response = await axios.post(`http://localhost:8000/signup`, {
         email,
-        password
+        password,
+        name,
+        zealId
       });
       localStorage.setItem("token", response.data.token);
       socket.emit('authenticate', localStorage.getItem("token"));
@@ -48,20 +54,15 @@ function YourMessagingComponent() {
   };
   const sendMessage = () => {
     // Emit a 'message' event to the server
-    socket.emit('message', {
-      senderToken:localStorage.getItem("token"),
-      receiver: id, // Provide the receiver's ID
-      text: newMessage,
-    });
-
-    // Update the local state or clear the input field
-    setNewMessage('');
+    socket.emit('assignTeams');
   };
   const msg=async()=>{
     try {
-      const response = await axios.post(`http://localhost:8000/unread-messages`,{
-        user2IdString:id
-      },{
+      const response = await axios.post(`http://localhost:8000/scan-qrcode`,
+      { scannedCode,
+        teamIdStr
+      },
+      {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -73,15 +74,6 @@ function YourMessagingComponent() {
   }
   return (
     <div>
-      {/* Display your messages */}
-      <ul>
-        {messages.map((message) => (
-          <li key={message._id}>
-            {message.sender}<br></br>
-            {message.text}
-          </li>
-        ))}
-      </ul>
 
       {/* Input field and send button */}
       <input
@@ -90,26 +82,9 @@ function YourMessagingComponent() {
         onChange={(e) => setNewMessage(e.target.value)}
       />
       <button onClick={sendMessage}>Send</button>
-      <button onClick={handleLogin}>signup</button>
-      Enter the id
-      <input
-        type="text"
-        value={id}
-        onChange={(e) => setId(e.target.value)}
-      />
-      Enter the login email 
-      <input
-        type="text"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      Pass
-      <input
-        type="text"
-        value={password}
-        onChange={(e) => setPass(e.target.value)}
-      />
-      <button onClick={msg}>Get msg</button>
+      <button onClick={handleSignup}>signup</button>
+      
+      <button onClick={msg}>Scan</button>
     </div>
   );
 }
