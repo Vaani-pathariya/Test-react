@@ -15,7 +15,7 @@ function YourMessagingComponent() {
   const [zealId,setZealId]=useState('3')
   const [scannedCode,setCode]=useState('65993fd348ca164f23952fc6')
   const [teamIdStr,setTeamId]=useState('65999d9ccd59de25d66ab7a8')
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState(["jikgjed","ejrkfksle","fkjehrsdf"]);
   useEffect(() => {
     // Listen for incoming messages
     socket.on('message', (message) => {
